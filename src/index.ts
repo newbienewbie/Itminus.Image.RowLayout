@@ -6,6 +6,14 @@ module ImagesLayout{
         height:number;
     };
 
+    interface IImagesWithinRow{
+        start: number;               //
+        end :number;                 //  [start,end]
+        accWidths:number;
+        images: IImageDescription[],
+        widthPercentages:number[]; 
+    }
+
     export class RowLayout{
 
         images: IImageDescription[];
@@ -42,8 +50,9 @@ module ImagesLayout{
         }
 
         // search a range like [start,end] that image between [start,end] will be rendered within same row
-        private _findRowRange(idx:number = 0) :{start:number;end:number; accWidths:number}{
-            var result ={ start :idx, end :idx, accWidths:0}; //  [start,end],
+        private _findRowRange(idx:number = 0) : IImagesWithinRow{
+
+            var result:IImagesWithinRow ={ start:idx, end :idx, accWidths:0, widthPercentages:[], images:[]}; 
 
             while(idx < this.images.length){
                 let image = this.images[idx];
@@ -70,6 +79,15 @@ module ImagesLayout{
                 idx=idx+1;
             }
             result.end= idx;
+
+            result.images= this.images.filter((img,idx)=>idx>=result.start && idx<=result.end);
+            
+            result.widthPercentages= result.images.map(img=>{
+                var alpha = img.height / this.stdLineHeight; // scale this image to standard height
+                let imageWidth = img.width / alpha;          // the width when scaling to the standard height
+                return imageWidth/result.accWidths;
+            })
+
             return result;
         }
 
@@ -82,18 +100,10 @@ module ImagesLayout{
             var omiga = accWidths/this.totalLineWidth;  // ω : used to scale these images to 100% width
             var renderedHeight = Math.ceil(this.stdLineHeight / omiga ); // the rendered height when scale these images with ω 
 
-            // images within this row 
-            var imagesWithinThisRow = this.images
-                .filter((img,idx)=>idx>=rowRange.start && idx<=rowRange.end);
-            // the raw widths of these images : will be used to calculate the width percentage 
-            var originalTotalWidth =imagesWithinThisRow
-                .map(img=>img.width)
-                .reduce((p,c,idx,arr)=> p + c,0);
-
-            var images =imagesWithinThisRow.map(i => {
-                var widthPercentage = i.width/originalTotalWidth;
+            var images =rowRange.images.map((img,idx) => {
+                var widthPercentage = rowRange.widthPercentages[idx] ;
                 var itemElement = this._createImageContainer(renderedHeight,widthPercentage);
-                var imageElement = this._createImageElement(i);
+                var imageElement = this._createImageElement(img);
                 itemElement.appendChild(imageElement);
                 return itemElement;
             });
