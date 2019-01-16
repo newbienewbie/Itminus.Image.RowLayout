@@ -1,12 +1,12 @@
 {
-  "name": "imageshow",
-  "version": "1.0.0",
-  "description": "",
+  "name": "itminus-image-rowlayout",
+  "version": "0.0.1",
+  "description": "a tiny library for images shown in rows",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": "itminus@hotmail.com",
   "license": "ISC",
   "devDependencies": {
     "typescript": "^3.2.2"
