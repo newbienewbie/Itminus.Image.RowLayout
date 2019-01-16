@@ -1,6 +1,6 @@
 {
   "name": "itminus-image-rowlayout",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "a tiny library for images shown in rows",
   "main": "index.js",
   "scripts": {
